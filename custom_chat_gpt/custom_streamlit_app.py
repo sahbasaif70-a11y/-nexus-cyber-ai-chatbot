@@ -27,10 +27,16 @@ custom_css = """
         font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
     }
 
-    /* Hide default Streamlit elements */
-    #MainMenu {visibility: hidden;}
-    footer {visibility: hidden;}
-    header {visibility: hidden;}
+    /* Sidebar Toggle Button Control Always Visible */
+    [data-testid="stSidebarCollapsedControl"] {
+        display: flex !important;
+        z-index: 999999 !important;
+        color: #00f0ff !important;
+        background: rgba(12, 11, 36, 0.9) !important;
+        border: 1px solid #00f0ff !important;
+        border-radius: 8px !important;
+        margin: 8px !important;
+    }
 
     /* Top Navbar */
     .top-navbar {
@@ -340,10 +346,8 @@ if not st.session_state.authenticated:
                 st.error("Please enter a valid API Key.")
     st.stop()
 
-# ---------------------------------------------------------
 # UNLOCKED MAIN INTERFACE
-# ---------------------------------------------------------
-current_chat = st.session_state.chats[st.session_state.current_chat_id]
+# (Note: current_chat is dynamically evaluated after sidebar)
 
 # ---------------------------------------------------------
 # Top Navbar
@@ -434,6 +438,9 @@ with st.sidebar:
         ⚡ Build your dreams with AI ›
     </div>
     """, unsafe_allow_html=True)
+
+# Always fetch current chat after sidebar updates
+current_chat = st.session_state.chats[st.session_state.current_chat_id]
 
 # Build LLM Instance
 try:
