@@ -1,3 +1,7 @@
+
+
+https://github.com/user-attachments/assets/05679a2c-017a-4c78-93ec-52ce4e9e2bb4
+
 # ⚡ Nexus Cyber AI — Next-Gen AI Assistant Dashboard
 
 Nexus Cyber AI is an ultra-modern, cyberpunk-themed AI Assistant web application built with **Streamlit**, **LangChain**, **Groq LLM**, and **OpenAI**. It features dynamic multi-chat session management, customizable system personas, a prompt marketplace template explorer, model parameter controls, and chat history exports.
