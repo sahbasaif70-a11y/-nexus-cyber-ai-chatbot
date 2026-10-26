@@ -80,6 +80,15 @@ def load_documents_from_file(file_path: str, file_name: str) -> List[Document]:
 
     return docs
 
+@app.get("/")
+def read_root():
+    return {
+        "status": "online",
+        "message": "Multi-Format RAG API is running successfully!",
+        "docs_url": "/docs",
+        "health_check": "/api/health"
+    }
+
 @app.get("/api/health")
 def health_check():
     return {"status": "ok", "message": "Multi-Format RAG API is running"}
