@@ -291,6 +291,9 @@ st.markdown(custom_css, unsafe_allow_html=True)
 # ---------------------------------------------------------
 # Session State Initialization
 # ---------------------------------------------------------
+if "main_nav_tab" not in st.session_state:
+    st.session_state.main_nav_tab = "💬 Chat"
+
 if "user_name" not in st.session_state or not st.session_state.user_name:
     st.session_state.user_name = "Sahba Saif"
 
@@ -319,6 +322,37 @@ if "chats" not in st.session_state:
 
 if "current_chat_id" not in st.session_state or st.session_state.current_chat_id not in st.session_state.chats:
     st.session_state.current_chat_id = list(st.session_state.chats.keys())[0]
+
+# Callbacks for Navigation and State Updates (runs before rerun to avoid StreamlitAPIException)
+def create_new_chat_callback():
+    new_id = str(uuid.uuid4())
+    st.session_state.chats[new_id] = {
+        "title": "New Conversation",
+        "system_role": f"You are {st.session_state.user_name}'s personal AI Assistant.",
+        "messages": []
+    }
+    st.session_state.current_chat_id = new_id
+    st.session_state.main_nav_tab = "💬 Chat"
+
+def select_chat_callback(chat_id):
+    st.session_state.current_chat_id = chat_id
+    st.session_state.main_nav_tab = "💬 Chat"
+
+def delete_chat_callback(chat_id):
+    if len(st.session_state.chats) > 1:
+        del st.session_state.chats[chat_id]
+        if st.session_state.current_chat_id not in st.session_state.chats:
+            st.session_state.current_chat_id = list(st.session_state.chats.keys())[0]
+
+def launch_template_callback(title, system_role, user_prompt):
+    new_id = str(uuid.uuid4())
+    st.session_state.chats[new_id] = {
+        "title": title,
+        "system_role": system_role,
+        "messages": [HumanMessage(content=user_prompt)]
+    }
+    st.session_state.current_chat_id = new_id
+    st.session_state.main_nav_tab = "💬 Chat"
 
 # Compute User Initials for Avatar
 name_parts = st.session_state.user_name.strip().split()
@@ -420,16 +454,7 @@ with st.sidebar:
     with col_h1:
         st.markdown("<p style='font-size: 0.9rem; font-weight: 700; color: #94a3b8; margin-top: 5px;'>📜 Chat History</p>", unsafe_allow_html=True)
     with col_h2:
-        if st.button("➕ New Chat", key="new_chat_btn", use_container_width=True, type="primary"):
-            new_id = str(uuid.uuid4())
-            st.session_state.chats[new_id] = {
-                "title": "New Conversation",
-                "system_role": f"You are {st.session_state.user_name}'s personal AI Assistant.",
-                "messages": []
-            }
-            st.session_state.current_chat_id = new_id
-            st.session_state.main_nav_tab = "💬 Chat"
-            st.rerun()
+        st.button("➕ New Chat", key="new_chat_btn", use_container_width=True, type="primary", on_click=create_new_chat_callback)
 
     # Chat History Cards List
     for chat_id, chat_data in list(st.session_state.chats.items()):
@@ -440,16 +465,10 @@ with st.sidebar:
         btn_type = "secondary" if chat_id != st.session_state.current_chat_id else "primary"
         col1, col2 = st.columns([0.82, 0.18])
         with col1:
-            if st.button(f"💬 {title}", key=f"select_{chat_id}", use_container_width=True, type=btn_type):
-                st.session_state.current_chat_id = chat_id
-                st.session_state.main_nav_tab = "💬 Chat"
-                st.rerun()
+            st.button(f"💬 {title}", key=f"select_{chat_id}", use_container_width=True, type=btn_type, on_click=select_chat_callback, args=(chat_id,))
         with col2:
             if len(st.session_state.chats) > 1:
-                if st.button("🗑️", key=f"del_{chat_id}", help="Delete chat"):
-                    del st.session_state.chats[chat_id]
-                    st.session_state.current_chat_id = list(st.session_state.chats.keys())[0]
-                    st.rerun()
+                st.button("🗑️", key=f"del_{chat_id}", help="Delete chat", on_click=delete_chat_callback, args=(chat_id,))
 
     st.markdown("---")
 
@@ -588,16 +607,18 @@ elif nav_tab == "🧭 Explore":
             <p style="color: #cbd5e1; font-size: 0.9rem;">Analyze your code for bugs, efficiency, security vulnerabilities, and clean architecture.</p>
         </div>
         """, unsafe_allow_html=True)
-        if st.button("⚡ Launch Code Reviewer Template", key="exp_code", use_container_width=True, type="primary"):
-            new_id = str(uuid.uuid4())
-            st.session_state.chats[new_id] = {
-                "title": "Code Reviewer",
-                "system_role": "You are an expert Senior Python Developer & Security Auditor. Review code thoroughly.",
-                "messages": [HumanMessage(content="Can you help me review and optimize my Python codebase?")]
-            }
-            st.session_state.current_chat_id = new_id
-            st.session_state.main_nav_tab = "💬 Chat"
-            st.rerun()
+        st.button(
+            "⚡ Launch Code Reviewer Template",
+            key="exp_code",
+            use_container_width=True,
+            type="primary",
+            on_click=launch_template_callback,
+            args=(
+                "Code Reviewer",
+                "You are an expert Senior Python Developer & Security Auditor. Review code thoroughly.",
+                "Can you help me review and optimize my Python codebase?"
+            )
+        )
 
         st.markdown("""
         <div class="explore-card" style="margin-top: 1.5rem;">
@@ -605,16 +626,18 @@ elif nav_tab == "🧭 Explore":
             <p style="color: #cbd5e1; font-size: 0.9rem;">Generate value propositions, target audience personas, and tech stack architecture for new startups.</p>
         </div>
         """, unsafe_allow_html=True)
-        if st.button("⚡ Launch Startup Advisor Template", key="exp_startup", use_container_width=True, type="primary"):
-            new_id = str(uuid.uuid4())
-            st.session_state.chats[new_id] = {
-                "title": "Startup Architect",
-                "system_role": "You are a Silicon Valley Product Strategist and Tech Founder. Help build innovative startups.",
-                "messages": [HumanMessage(content="Give me a comprehensive blueprint for launching a successful AI SaaS product.")]
-            }
-            st.session_state.current_chat_id = new_id
-            st.session_state.main_nav_tab = "💬 Chat"
-            st.rerun()
+        st.button(
+            "⚡ Launch Startup Advisor Template",
+            key="exp_startup",
+            use_container_width=True,
+            type="primary",
+            on_click=launch_template_callback,
+            args=(
+                "Startup Architect",
+                "You are a Silicon Valley Product Strategist and Tech Founder. Help build innovative startups.",
+                "Give me a comprehensive blueprint for launching a successful AI SaaS product."
+            )
+        )
 
     with exp_col2:
         st.markdown("""
@@ -623,16 +646,18 @@ elif nav_tab == "🧭 Explore":
             <p style="color: #cbd5e1; font-size: 0.9rem;">Get a week-by-week learning roadmap for Data Science, AI Engineering, or Software Development.</p>
         </div>
         """, unsafe_allow_html=True)
-        if st.button("⚡ Launch Learning Roadmap Template", key="exp_roadmap", use_container_width=True, type="primary"):
-            new_id = str(uuid.uuid4())
-            st.session_state.chats[new_id] = {
-                "title": "Career Mentor",
-                "system_role": "You are a Tech Career Mentor. Provide step-by-step actionable learning pathways.",
-                "messages": [HumanMessage(content="Create a 3-month step-by-step roadmap to become a Master AI Engineer.")]
-            }
-            st.session_state.current_chat_id = new_id
-            st.session_state.main_nav_tab = "💬 Chat"
-            st.rerun()
+        st.button(
+            "⚡ Launch Learning Roadmap Template",
+            key="exp_roadmap",
+            use_container_width=True,
+            type="primary",
+            on_click=launch_template_callback,
+            args=(
+                "Career Mentor",
+                "You are a Tech Career Mentor. Provide step-by-step actionable learning pathways.",
+                "Create a 3-month step-by-step roadmap to become a Master AI Engineer."
+            )
+        )
 
         st.markdown("""
         <div class="explore-card" style="margin-top: 1.5rem;">
@@ -640,16 +665,18 @@ elif nav_tab == "🧭 Explore":
             <p style="color: #cbd5e1; font-size: 0.9rem;">Draft professional API documentation, project README files, and keynote speeches.</p>
         </div>
         """, unsafe_allow_html=True)
-        if st.button("⚡ Launch Documentation Writer Template", key="exp_docs", use_container_width=True, type="primary"):
-            new_id = str(uuid.uuid4())
-            st.session_state.chats[new_id] = {
-                "title": "Tech Docs Writer",
-                "system_role": "You are a Technical Writer. Write beautiful, crystal-clear documentation and speeches.",
-                "messages": [HumanMessage(content="Help me draft a high-impact technical keynote speech and README documentation.")]
-            }
-            st.session_state.current_chat_id = new_id
-            st.session_state.main_nav_tab = "💬 Chat"
-            st.rerun()
+        st.button(
+            "⚡ Launch Documentation Writer Template",
+            key="exp_docs",
+            use_container_width=True,
+            type="primary",
+            on_click=launch_template_callback,
+            args=(
+                "Tech Docs Writer",
+                "You are a Technical Writer. Write beautiful, crystal-clear documentation and speeches.",
+                "Help me draft a high-impact technical keynote speech and README documentation."
+            )
+        )
 
 # ---------------------------------------------------------
 # TAB 3: SETTINGS & TOOLS VIEW
