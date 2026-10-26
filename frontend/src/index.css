@@ -1,0 +1,62 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    background-color: #080715;
+    color: #f1f5f9;
+  }
+}
+
+/* Glassmorphism Panel Utility */
+.glass-panel {
+  background: rgba(15, 12, 34, 0.75);
+  backdrop-filter: blur(20px) saturate(180%);
+  border: 1px solid rgba(168, 85, 247, 0.25);
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.4), inset 0 0 20px rgba(168, 85, 247, 0.05);
+}
+
+.glass-panel-glow {
+  background: rgba(18, 14, 42, 0.8);
+  backdrop-filter: blur(25px);
+  border: 1px solid rgba(168, 85, 247, 0.4);
+  box-shadow: 0 0 30px rgba(168, 85, 247, 0.25), inset 0 0 15px rgba(236, 72, 153, 0.1);
+}
+
+.glass-sidebar {
+  background: rgba(12, 10, 28, 0.85);
+  backdrop-filter: blur(25px) saturate(200%);
+  border-right: 1px solid rgba(168, 85, 247, 0.2);
+  box-shadow: 10px 0 40px rgba(124, 58, 237, 0.15);
+}
+
+.neon-gradient-text {
+  background: linear-gradient(135deg, #ffffff 0%, #d8b4fe 30%, #e879f9 65%, #38bdf8 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: rgba(10, 8, 24, 0.5);
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(168, 85, 247, 0.3);
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(232, 121, 249, 0.6);
+}
+
+/* Custom Sliders */
+input[type="range"] {
+  accent-color: #c084fc;
+}
