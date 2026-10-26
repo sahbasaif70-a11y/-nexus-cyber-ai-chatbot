@@ -10,6 +10,8 @@ import { Menu, Bot, Sparkles, X } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 export default function App() {
+  const API_BASE_URL = import.meta.env.VITE_API_URL || '';
+
   // Configuration state
   const [apiKey, setApiKey] = useState('');
   const [model, setModel] = useState('gpt-4o-mini');
@@ -51,7 +53,7 @@ export default function App() {
     formData.append('chunk_overlap', chunkOverlap);
 
     try {
-      const response = await fetch('/api/index', {
+      const response = await fetch(`${API_BASE_URL}/api/index`, {
         method: 'POST',
         body: formData,
       });
@@ -95,7 +97,7 @@ export default function App() {
     setIsLoading(true);
 
     try {
-      const response = await fetch('/api/chat', {
+      const response = await fetch(`${API_BASE_URL}/api/chat`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

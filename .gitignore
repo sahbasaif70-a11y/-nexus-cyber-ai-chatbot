@@ -1,12 +1,16 @@
+# Ignore unrelated local folders
+custom_chat_gpt/
+openai-agent-sdk/
+Lab1/
+Lab2/
+
 # Node dependencies
 node_modules/
 frontend/node_modules/
-Multi_Format_RAG_App/frontend/node_modules/
 
 # Build outputs
 dist/
 frontend/dist/
-Multi_Format_RAG_App/frontend/dist/
 
 # Python virtual environment & cache
 __pycache__/
